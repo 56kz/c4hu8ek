@@ -21,11 +21,11 @@ class Api::V1::PinsController < ApplicationController
 
     def basic_auth
       user = User.find_by(email: request.headers['HTTP_X_USER_EMAIL'])
-      if user
-        request.headers['X-API-TOKEN'] == user.api_token
-      else
-        render json: { errors: "Acces denied" }, status: 401
-      end
+       acces = user ? request.headers['X-API-TOKEN'] == user.api_token : false
+
+       unless acces
+         render json: { errors: "Acceso denegado" }, status: 401
+       end
     end
 
 end
