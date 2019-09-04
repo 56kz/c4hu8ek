@@ -1,6 +1,8 @@
 class Api::V1::PinsController < ApplicationController
+  before_action :basic_auth
+
   def index
-    render json: Pin.all.order('created_at DESC')
+    render json: { data: Pin.all.order('created_at DESC') }
   end
 
   def create
@@ -16,4 +18,14 @@ class Api::V1::PinsController < ApplicationController
     def pin_params
       params.require(:pin).permit(:title, :image_url)
     end
+
+    def basic_auth
+      user = User.find_by(email: request.headers['HTTP_X_USER_EMAIL'])
+      if user
+        request.headers['X-API-TOKEN'] == user.api_token
+      else
+        render json: { errors: "Acces denied" }, status: 401
+      end
+    end
+
 end
